@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { stringify } = require('querystring');
 
-const UserSchema = new mongoose.Schema({
+const MerchantSchema = new mongoose.Schema({
 	description: {
 		type: String,
 		maxlength: 250,
@@ -24,7 +24,6 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		maxlength: 30,
 		minlength: 3,
-		required: [true, 'PLease add a name'],
 	},
 	password: {
 		type: String,
@@ -45,7 +44,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 //encrypting password
-UserSchema.pre('save', async function (next) {
+MerchantSchema.pre('save', async function (next) {
 	if (!this.isModified('password')) {
 		next();
 	}
@@ -55,19 +54,19 @@ UserSchema.pre('save', async function (next) {
 });
 
 //Sign  token and return
-UserSchema.methods.getSignedJWToken = function () {
+MerchantSchema.methods.getSignedJWToken = function () {
 	return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRE,
 	});
 };
 
 //match hashed password
-UserSchema.methods.matchPassword = async function (userPassword) {
+MerchantSchema.methods.matchPassword = async function (userPassword) {
 	return await bcrypt.compare(userPassword, this.password);
 };
 
 //generate/hash pass token
-UserSchema.methods.getResetPassToken = function () {
+MerchantSchema.methods.getResetPassToken = function () {
 	//gen token
 	const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -82,4 +81,4 @@ UserSchema.methods.getResetPassToken = function () {
 	return resetToken;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Merchant', MerchantSchema);

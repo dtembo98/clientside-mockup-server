@@ -1,35 +1,52 @@
 const ErrorResponse = require('../utils/ErrorResponse');
-const User = require('../models/User');
+const Merchant = require('../models/Merchant');
 const asyncHandler = require('../middleware/async');
 const crypto = require('crypto');
 
+exports.register = asyncHandler(async (req, res, next) => {
+	const { email, password } = req.body;
+	console.log(req.body);
+	const merchant = await Merchant.create({
+		email: email,
+		password,
+	});
+
+	sendTokenResponse(merchant, 200, res);
+});
+
 exports.login = asyncHandler(async (req, res, next) => {
 	const { email, password } = req.body;
+	console.log(req.body);
 
 	if (!email || !password) {
 		return next(
-			new ErrorResponse('please provide an email and password', 400),
+			new ErrorResponse(
+				'please provide an email address and password',
+				400,
+			),
 		);
 	}
-	const user = await User.findOne({ email }).select('+password');
+	const merchant = await Merchant.findOne({ email: email }).select(
+		'+password',
+	);
 
-	if (!user) {
+	if (!merchant) {
 		return next(new ErrorResponse('Invalid login credentials', 401));
 	}
 
 	//check password
-	const isPasswordMatch = await user.matchPassword(password);
+	const isPasswordMatch = await merchant.matchPassword(password);
 
 	if (!isPasswordMatch) {
 		return next(new ErrorResponse('Invalid login credentials', 401));
 	}
 
-	sendTokenResponse(user, 200, res);
+	sendTokenResponse(merchant, 200, res);
 });
 
 //get token, create cookie
-const sendTokenResponse = (user, statusCdode, res) => {
-	const token = user.getSignedJWToken();
+const sendTokenResponse = (merchant, statusCdode, res) => {
+	const token = merchant.getSignedJWToken();
 	const options = {
 		expires: new Date(
 			Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000,

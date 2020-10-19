@@ -10,6 +10,8 @@ const dotenv = require('dotenv').config({ path: './config/config.env' });
 const path = require('path');
 const connectDB = require('./config/db');
 
+app.use(morgan('tiny'));
+
 //connect database
 connectDB();
 
@@ -19,7 +21,6 @@ app.use(express.json());
 //cookie parser
 app.use(cookieParser());
 
-app.use(morgan('tiny'));
 app.use(cors());
 
 app.use('/api/v1', authRoutes);

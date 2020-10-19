@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/ErrorResponse');
-const User = require('../models/User');
+const Merchant = require('../models/Merchant');
 
 //protecting routes
 exports.protect = asyncHandler(async (req, res, next) => {
@@ -29,7 +29,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 		console.log(decoded);
 
-		req.user = await User.findById(decoded.id);
+		req.user = await Merchant.findById(decoded.id);
 		next();
 	} catch (error) {
 		return next(
@@ -41,7 +41,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 //give access to specific roles
 exports.authorize = (...roles) => {
 	return (req, res, next) => {
-		if (!roles.includes(req.user.role)) {
+		if (!roles.includes(req.Merchant.role)) {
 			return next(
 				new ErrorResponse(
 					`User role '${req.user.role}' is not authorized to access this route`,
