@@ -5,14 +5,16 @@ const crypto = require('crypto');
 const { stringify } = require('querystring');
 
 const MerchantSchema = new mongoose.Schema({
-	description: {
-		type: String,
-		maxlength: 250,
-		minlength: [5, 'A little bit more please'],
-		default:
-			'a little something about who you are, what you do and what your interests are will go a long way',
+	userAcceptedConditions: {
+		type: Boolean,
+		required: true,
 	},
-	email: {
+	businessname: {
+		type: String,
+		maxlength: 30,
+		minlength: 3,
+	},
+	emailaddress: {
 		type: String,
 		match: [
 			/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
@@ -20,10 +22,24 @@ const MerchantSchema = new mongoose.Schema({
 		required: [true, 'We need your email too'],
 		unique: true,
 	},
-	name: {
+	websiteurl: {
 		type: String,
-		maxlength: 30,
-		minlength: 3,
+		default: 'no-website',
+	},
+	description: {
+		type: String,
+		maxlength: 250,
+		minlength: [5, 'A little bit more please'],
+		default:
+			'a little something about who you are, what you do and what your interests are will go a long way',
+	},
+	country: {
+		type: String,
+	},
+
+	preferredcurrency: {
+		type: String,
+		enum: ['ZMK', 'USD', 'GBP', 'EUR'],
 	},
 	password: {
 		type: String,
@@ -31,10 +47,7 @@ const MerchantSchema = new mongoose.Schema({
 		minlength: [8, 'password should be atleast 8 characters long'],
 		select: false,
 	},
-	website: {
-		type: String,
-		default: 'no-website',
-	},
+
 	resetPasswordToken: String,
 	resetPasswordExpire: Date,
 	createdAt: {

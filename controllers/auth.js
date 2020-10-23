@@ -4,14 +4,32 @@ const asyncHandler = require('../middleware/async');
 const crypto = require('crypto');
 
 exports.register = asyncHandler(async (req, res, next) => {
-	const { email, password } = req.body;
+	const {
+		userAcceptedConditions,
+		businessname,
+		emailaddress,
+		websiteurl,
+		description,
+		country,
+		preferredcurrency,
+		password,
+		confirmpassword,
+	} = req.body;
 	console.log(req.body);
 	const merchant = await Merchant.create({
-		email: email,
+		userAcceptedConditions,
+		businessname,
+		emailaddress,
+		websiteurl,
+		description,
+		country,
+		preferredcurrency,
 		password,
+		confirmpassword,
 	});
 
 	sendTokenResponse(merchant, 200, res);
+	next();
 });
 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -26,7 +44,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 			),
 		);
 	}
-	const merchant = await Merchant.findOne({ email: email }).select(
+	const merchant = await Merchant.findOne({ emailaddress: email }).select(
 		'+password',
 	);
 
@@ -43,6 +61,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 
 	sendTokenResponse(merchant, 200, res);
 });
+
+exports.getMerchants = (req, res, next) => {
+	const merchants = Merchant.find();
+	res.status(200).send(merchants);
+};
 
 //get token, create cookie
 const sendTokenResponse = (merchant, statusCdode, res) => {
